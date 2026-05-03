@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hesn-v3';
+const CACHE_NAME = 'hesn-v4';
 
 const BASE = '/hesnak-alyawmy/';
 

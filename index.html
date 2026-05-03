@@ -985,6 +985,27 @@ let myGroupCode=localStorage.getItem("myGroupCode")||null;
 let myName=localStorage.getItem("myName")||null;
 let myUserId=localStorage.getItem("myUserId")||('u'+Math.random().toString(36).substr(2,8));
 localStorage.setItem("myUserId",myUserId);
+  const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+supabase
+.channel('members-live')
+.on(
+  'postgres_changes',
+  {
+    event: '*',
+    schema: 'public',
+    table: 'members'
+  },
+  () => {
+    if(myGroupCode){
+      renderLeaderboard();
+    }
+  }
+)
+.subscribe();
 
 function openGroup(){
   hideAll();document.getElementById("groupArea").style.display="block";

@@ -947,7 +947,7 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 window.addEventListener('load',()=>{const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;if(isIos&&!isStandalone)document.getElementById('iosHint').style.display='block';if(isStandalone){document.getElementById('installBtn').style.display='none';document.getElementById('iosHint').style.display='none';}});
 async function installApp(){if(!deferredPrompt){showMiniToast("افتح من Chrome 📲");return;}await deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('installBtn').style.display='none';if(outcome==='accepted')showMiniToast('🎉 تم تنزيل التطبيق!');}
 window.addEventListener('appinstalled',()=>{document.getElementById('installBtn').style.display='none';showMiniToast('🎉 حصنك على الهوم سكرين!');});
-if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{await navigator.serviceWorker.register('/sw.js',{scope:'/'});}catch(e){}});
+if('serviceWorker' in navigator)window.addEventListener('load',async()=>{try{await navigator.serviceWorker.register('./sw.js');,{scope:'/'});}catch(e){}});
 const up=new URLSearchParams(window.location.search),mp=up.get('mode');
 if(mp&&['morning','evening','quick'].includes(mp))setTimeout(()=>startMode(mp),500);
 </script>

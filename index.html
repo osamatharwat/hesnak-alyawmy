@@ -1032,8 +1032,20 @@ async function joinGroup(){
     const groups=await sbFetch(`groups?code=eq.${code}&select=code`);
     if(!groups.length){setGroupStatus("❌ الكود ده مش موجود، تأكد منه",  '#ef4444');return;}
     // أضف العضو أو حدّث لو موجود
-    await sbFetch('members',{method:'POST',prefer:'resolution=merge-duplicates',body:JSON.stringify({group_code:code,user_id:myUserId,name,streak,done_today:false})});
-    myGroupCode=code;myName=name;
+    await sbFetch(
+  'members?on_conflict=group_code,user_id',
+  {
+    method:'POST',
+    prefer:'resolution=merge-duplicates',
+    body:JSON.stringify({
+      group_code:code,
+      user_id:myUserId,
+      name,
+      streak,
+      done_today:false
+    })
+  }
+);
     localStorage.setItem("myGroupCode",code);localStorage.setItem("myName",name);
     showLeaderboard();showMiniToast("✅ انضممت للجروب!");
   }catch(e){
@@ -1101,7 +1113,20 @@ function renderHomeLB(arr){
 async function updateMyGroupStreak(){
   if(!myGroupCode)return;
   try{
-    await sbFetch(`members?group_code=eq.${myGroupCode}&user_id=eq.${myUserId}`,{method:'PATCH',body:JSON.stringify({streak,done_today:true})});
+  await sbFetch(
+  'members?on_conflict=group_code,user_id',
+  {
+    method:'POST',
+    prefer:'resolution=merge-duplicates',
+    body:JSON.stringify({
+      group_code:code,
+      user_id:myUserId,
+      name,
+      streak,
+      done_today:false
+    })
+  }
+);
   }catch(e){
     const m=JSON.parse(localStorage.getItem("group_"+myGroupCode)||"{}");
     if(m[myUserId]){m[myUserId].streak=streak;m[myUserId].done_today=true;localStorage.setItem("group_"+myGroupCode,JSON.stringify(m));}

@@ -521,6 +521,39 @@ async function sbFetch(path, opts={}) {
   return txt ? JSON.parse(txt) : [];
 }
 
+/* =========================
+   REALTIME
+========================= */
+
+const { createClient } = supabase;
+
+const realtimeClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+  realtimeClient
+.channel('members-live')
+.on(
+  'postgres_changes',
+  {
+    event: '*',
+    schema: 'public',
+    table: 'members'
+  },
+  payload => {
+
+    if(myGroupCode){
+      renderLeaderboard();
+    }
+
+    try{
+      new Audio(
+        'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=notification-2-269292.mp3'
+      ).play();
+    }catch(e){}
+  }
+)
+.subscribe();
 /* ================================================================
    AZKAR DATA
 ================================================================ */
@@ -1277,5 +1310,8 @@ if('serviceWorker' in navigator){
 const up=new URLSearchParams(window.location.search),mp=up.get('mode');
 if(mp&&['morning','evening','quick'].includes(mp))setTimeout(()=>startMode(mp),400);
 </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</body>
+</html>
 </body>
 </html>

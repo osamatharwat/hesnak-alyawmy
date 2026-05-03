@@ -255,6 +255,18 @@ body.kahf-theme{background:radial-gradient(circle at top,#065f46,#020617);}
 
 #installBtn{display:none;margin-bottom:10px;width:100%;background:linear-gradient(135deg,#22c55e,#15803d);border:none;color:white;padding:13px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;}
 #iosHint{display:none;margin-bottom:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 13px;font-size:12px;color:#fde68a;line-height:1.8;text-align:center;}
+#musicBtn{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  color:white;
+  padding:10px 14px;
+  border-radius:14px;
+  font-family:'Cairo',sans-serif;
+  font-weight:700;
+  margin-bottom:12px;
+  cursor:pointer;
+  width:100%;
+}
 </style>
 </head>
 <body>
@@ -266,6 +278,9 @@ body.kahf-theme{background:radial-gradient(circle at top,#065f46,#020617);}
     <button id="installBtn" onclick="installApp()">📲 نزّل التطبيق</button>
     <div id="iosHint">📱 Safari → <strong>□↑</strong> → <strong>Add to Home Screen</strong></div>
   </div>
+  <button id="musicBtn" onclick="toggleMusic()">
+  🎵 تشغيل أصوات الطبيعة
+</button>
 
   <!-- SADAQA - بطاقات قابلة للتمرير -->
   <div class="sadaqa-box">
@@ -1015,6 +1030,19 @@ function openGroup(){
   if(myGroupCode&&myName) showLeaderboard();
   else{document.getElementById("groupSetup").style.display="block";document.getElementById("leaderboard").style.display="none";}
   goTo("groupArea");
+  myGroupCode = code;
+myName = name;
+
+localStorage.setItem("myGroupCode", code);
+localStorage.setItem("myName", name);
+
+// تحديث فوري
+await renderLeaderboard();
+
+document.getElementById("leaderboard").style.display = "block";
+document.getElementById("groupSetup").style.display = "none";
+
+showMiniToast("🚀 انضميت للجروب!");
 }
 
 function showJoinInput(){document.getElementById("joinRow").style.display="block";}
@@ -1111,7 +1139,10 @@ async function renderLeaderboard(){
   let arr=[];
   try{
     arr=await sbFetch(`members?group_code=eq.${myGroupCode}&order=streak.desc&limit=10`);
-  }catch(e){
+  }catch(e)
+  arr = await sbFetch(
+  `members?group_code=eq.${myGroupCode}&select=*`
+);{
     // fallback local
     const members=JSON.parse(localStorage.getItem("group_"+myGroupCode)||"{}");
     arr=Object.values(members).sort((a,b)=>b.streak-a.streak);
@@ -1169,15 +1200,44 @@ async function updateMyGroupStreak(){
 function copyGroupCode(){navigator.clipboard?.writeText(myGroupCode).then(()=>showMiniToast("✅ الكود اتنسخ!"));}
 
 function leaveGroup(){
-  if(confirm('هتطلع من الجروب؟')){
-    localStorage.removeItem("myGroupCode");localStorage.removeItem("myName");
-    myGroupCode=null;myName=null;
-    document.getElementById("groupSetup").style.display="block";
-    document.getElementById("leaderboard").style.display="none";
-    document.getElementById("homeLB").style.display="none";
-  }
-}
+  async function leaveGroup(){
 
+  if(!myGroupCode) return;
+
+  try{
+
+    // حذف العضو من Supabase
+    await sbFetch(
+      `members?group_code=eq.${myGroupCode}&user_id=eq.${myUserId}`,
+      {
+        method:'DELETE',
+        headers:{
+          Prefer:'return=minimal'
+        }
+      }
+    );
+
+  }catch(e){
+    console.log(e);
+  }
+
+  // حذف البيانات المحلية
+  localStorage.removeItem("myGroupCode");
+  localStorage.removeItem("myName");
+
+  myGroupCode = null;
+  myName = null;
+
+  // تحديث الواجهة
+  if(!myGroupCode){
+  document.getElementById("homeLB").style.display='none';
+}
+  document.getElementById("groupSetup").style.display="block";
+
+  renderHomeLB([]);
+  showMiniToast("🚪 خرجت من الجروب");
+
+}
 // تحميل الجروب عند فتح الصفحة لو موجود
 if(myGroupCode&&myName){
   setTimeout(async()=>{
@@ -1305,6 +1365,47 @@ realtimeClient
   }
 )
 .subscribe();
+const bgMusic = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+
+bgMusic.volume = 0.15;
+
+function toggleMusic(){
+
+  if(bgMusic.paused){
+
+    bgMusic.play();
+
+    musicBtn.innerText = "🔇 إيقاف الصوت";
+
+    localStorage.setItem("music","on");
+
+  }else{
+
+    bgMusic.pause();
+
+    musicBtn.innerText = "🎵 تشغيل أصوات الطبيعة";
+
+    localStorage.setItem("music","off");
+  }
+}
+
+if(localStorage.getItem("music")==="on"){
+
+  window.addEventListener("click",()=>{
+
+    bgMusic.play().catch(()=>{});
+
+    musicBtn.innerText="🔇 إيقاف الصوت";
+
+  },{once:true});
+}
+</script>
+
+<audio id="bgMusic" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=forest-lullaby-110624.mp3" type="audio/mpeg">
+</audio>
+
 </script>
 </body>
 </html>

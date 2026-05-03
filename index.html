@@ -739,15 +739,112 @@ const kahfAyat = [
 /* ================================================================
    QUOTES + STREAK
 ================================================================ */
-const quotes=["ألا بذكر الله تطمئن القلوب","واذكر ربك إذا نسيت","إن الله مع الصابرين","فاذكروني أذكركم","ولا تيأسوا من روح الله","إن مع العسر يسرا","واصبر وما صبرك إلا بالله","ومن يتوكل على الله فهو حسبه","إن الله يحب التوابين","لا تحزن إن الله معنا","ادعوني أستجب لكم","إن الله لا يضيع أجر المحسنين","وهو معكم أينما كنتم","رب اشرح لي صدري","إن رحمة الله قريب من المحسنين","إن الله غفور رحيم","واعبد ربك حتى يأتيك اليقين","وما توفيقي إلا بالله","أكثروا من الصلاة على النبي ﷺ","الدنيا ساعة فاجعلها طاعة","اجعل بينك وبين الله بابًا لا يغلق","الطمأنينة في القرب من الله","استغفر.. فباب الله لا يغلق","جنة القلب في ذكر الله","الله أقرب إليك مما تظن","كل تسبيحة نور 🤍","ربك يعلم تعبك فلا تيأس","ما دام الله معك فلا خوف"];
-let currentQuote=quotes[Math.floor(Math.random()*quotes.length)];
-document.getElementById("quote").innerText=currentQuote;
+window.addEventListener('DOMContentLoaded', () => {
 
-const today=new Date().toDateString();
-let storedLast=localStorage.getItem("lastVisit");
-let streak=parseInt(localStorage.getItem("streak"))||0;
-if(storedLast!==today){const y=new Date();y.setDate(y.getDate()-1);if(storedLast===y.toDateString())streak++;else streak=1;localStorage.setItem("lastVisit",today);localStorage.setItem("streak",streak);}
-document.getElementById("streak").innerText=streak;
+  const quotes = [
+
+    "ألا بذكر الله تطمئن القلوب",
+
+    "واذكر ربك إذا نسيت",
+
+    "إن الله مع الصابرين",
+
+    "فاذكروني أذكركم",
+
+    "ولا تيأسوا من روح الله",
+
+    "إن مع العسر يسرا",
+
+    "واصبر وما صبرك إلا بالله",
+
+    "ومن يتوكل على الله فهو حسبه",
+
+    "إن الله يحب التوابين",
+
+    "لا تحزن إن الله معنا",
+
+    "ادعوني أستجب لكم",
+
+    "إن الله لا يضيع أجر المحسنين",
+
+    "وهو معكم أينما كنتم",
+
+    "رب اشرح لي صدري",
+
+    "إن رحمة الله قريب من المحسنين",
+
+    "إن الله غفور رحيم",
+
+    "واعبد ربك حتى يأتيك اليقين",
+
+    "وما توفيقي إلا بالله",
+
+    "أكثروا من الصلاة على النبي ﷺ",
+
+    "الدنيا ساعة فاجعلها طاعة",
+
+    "اجعل بينك وبين الله بابًا لا يغلق",
+
+    "الطمأنينة في القرب من الله",
+
+    "استغفر.. فباب الله لا يغلق",
+
+    "جنة القلب في ذكر الله",
+
+    "الله أقرب إليك مما تظن",
+
+    "كل تسبيحة نور 🤍",
+
+    "ربك يعلم تعبك فلا تيأس",
+
+    "ما دام الله معك فلا خوف"
+
+  ];
+
+  let currentQuote =
+    quotes[Math.floor(Math.random() * quotes.length)];
+
+  const quoteElement =
+    document.getElementById("quote");
+
+  if (quoteElement) {
+
+    quoteElement.innerText = currentQuote;
+  }
+
+  // ===== STREAK =====
+
+  const today = new Date().toDateString();
+
+  let storedLast =
+    localStorage.getItem("lastVisit");
+
+  let streak =
+    parseInt(localStorage.getItem("streak")) || 0;
+
+  if (storedLast !== today) {
+
+    const y = new Date();
+
+    y.setDate(y.getDate() - 1);
+
+    if (storedLast === y.toDateString()) {
+
+      streak++;
+
+    } else {
+
+      streak = 1;
+    }
+
+    localStorage.setItem("lastVisit", today);
+
+    localStorage.setItem("streak", streak);
+  }
+
+  document.getElementById("streak").innerText = streak;
+
+});
 
 /* ================================================================
    SHARE

@@ -1342,29 +1342,6 @@ if(mp&&['morning','evening','quick'].includes(mp))setTimeout(()=>startMode(mp),4
 </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-const { createClient } = supabase;
-
-const realtimeClient = createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-realtimeClient
-.channel('members-live')
-.on(
-  'postgres_changes',
-  {
-    event: '*',
-    schema: 'public',
-    table: 'members'
-  },
-  () => {
-    if(myGroupCode){
-      renderLeaderboard();
-    }
-  }
-)
-.subscribe();
 const bgMusic = document.getElementById("bgMusic");
 const musicBtn = document.getElementById("musicBtn");
 
@@ -1400,6 +1377,62 @@ if(localStorage.getItem("music")==="on"){
 
   },{once:true});
 }
+
+<audio id="bgMusic" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=forest-lullaby-110624.mp3" type="audio/mpeg">
+</audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const bgMusic = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+
+if(bgMusic && musicBtn){
+
+  bgMusic.volume = 0.15;
+
+  musicBtn.addEventListener("click",()=>{
+
+    if(bgMusic.paused){
+
+      bgMusic.play();
+      musicBtn.innerText = "🔇 إيقاف الصوت";
+
+    }else{
+
+      bgMusic.pause();
+      musicBtn.innerText = "🎵 تشغيل أصوات الطبيعة";
+    }
+  });
+}
+
+/* REALTIME */
+
+const { createClient } = supabase;
+
+const realtimeClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+realtimeClient
+.channel('members-live')
+.on(
+  'postgres_changes',
+  {
+    event:'*',
+    schema:'public',
+    table:'members'
+  },
+  ()=>{
+    if(myGroupCode){
+      renderLeaderboard();
+    }
+  }
+)
+.subscribe();
+</script>
 
 <audio id="bgMusic" loop>
   <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=forest-lullaby-110624.mp3" type="audio/mpeg">

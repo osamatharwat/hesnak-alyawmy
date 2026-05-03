@@ -255,18 +255,6 @@ body.kahf-theme{background:radial-gradient(circle at top,#065f46,#020617);}
 
 #installBtn{display:none;margin-bottom:10px;width:100%;background:linear-gradient(135deg,#22c55e,#15803d);border:none;color:white;padding:13px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;}
 #iosHint{display:none;margin-bottom:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 13px;font-size:12px;color:#fde68a;line-height:1.8;text-align:center;}
-#musicBtn{
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.1);
-  color:white;
-  padding:10px 14px;
-  border-radius:14px;
-  font-family:'Cairo',sans-serif;
-  font-weight:700;
-  margin-bottom:12px;
-  cursor:pointer;
-  width:100%;
-}
 </style>
 </head>
 <body>
@@ -278,9 +266,6 @@ body.kahf-theme{background:radial-gradient(circle at top,#065f46,#020617);}
     <button id="installBtn" onclick="installApp()">📲 نزّل التطبيق</button>
     <div id="iosHint">📱 Safari → <strong>□↑</strong> → <strong>Add to Home Screen</strong></div>
   </div>
-  <button id="musicBtn" onclick="toggleMusic()">
-  🎵 تشغيل أصوات الطبيعة
-</button>
 
   <!-- SADAQA - بطاقات قابلة للتمرير -->
   <div class="sadaqa-box">
@@ -1429,10 +1414,6 @@ realtimeClient
 )
 .subscribe();
 </script>
-
-<audio id="bgMusic" loop>
-  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=forest-lullaby-110624.mp3" type="audio/mpeg">
-</audio>
 </body>
 </html>
 </body>

@@ -994,7 +994,18 @@ async function createGroup(){
   setGroupStatus("⏳ جاري الإنشاء...");
   try{
     // إنشاء الجروب
-    await sbFetch('groups',{method:'POST',body:JSON.stringify({code,name:name+"'s Group",week_start:getWeekStart()})});
+    await sbFetch(
+  'groups?on_conflict=code',
+  {
+    method:'POST',
+    prefer:'resolution=merge-duplicates',
+    body:JSON.stringify({
+      code,
+      name:name+"'s Group",
+      week_start:getWeekStart()
+    })
+  }
+);
     // إضافة العضو
     await sbFetch('members',{method:'POST',body:JSON.stringify({group_code:code,user_id:myUserId,name,streak,done_today:false})});
     myGroupCode=code;myName=name;

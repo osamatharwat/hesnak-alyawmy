@@ -1330,64 +1330,6 @@ if(mp&&['morning','evening','quick'].includes(mp))setTimeout(()=>startMode(mp),4
 </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-const { createClient } = supabase;
-
-const realtimeClient = createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-realtimeClient
-.channel('members-live')
-.on(
-  'postgres_changes',
-  {
-    event: '*',
-    schema: 'public',
-    table: 'members'
-  },
-  () => {
-    if(myGroupCode){
-      renderLeaderboard();
-    }
-  }
-)
-.subscribe();
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const { createClient } = supabase;
-
-const realtimeClient = createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-realtimeClient
-.channel('members-live')
-.on(
-  'postgres_changes',
-  {
-    event: '*',
-    schema: 'public',
-    table: 'members'
-  },
-  payload => {
-
-    if(myGroupCode){
-      renderLeaderboard();
-    }
-
-    try{
-      new Audio(
-        'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=notification-2-269292.mp3'
-      ).play();
-    }catch(e){}
-  }
-)
-.subscribe();
-</script>
-</script>
 </body>
 </html>
 </body>

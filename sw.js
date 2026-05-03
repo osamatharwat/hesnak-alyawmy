@@ -1,18 +1,20 @@
-const CACHE_NAME = 'hisn-v2';
+const CACHE_NAME = 'hesn-v3';
+
+const BASE = '/hesnak-alyawmy/';
 
 const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icons/icon-192x192.png',
-  './icons/icon-512x512.png',
-  'https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap'
+  BASE,
+  BASE + 'index.html',
+  BASE + 'manifest.json',
+  BASE + 'icons/icon-192x192.png',
+  BASE + 'icons/icon-512x512.png'
 ];
 
-// ===== INSTALL =====
-self.addEventListener('install', e => {
+// INSTALL
+self.addEventListener('install', event => {
 
-  e.waitUntil(
+  event.waitUntil(
+
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(ASSETS))
   );
@@ -20,15 +22,18 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// ===== ACTIVATE =====
-self.addEventListener('activate', e => {
+// ACTIVATE
+self.addEventListener('activate', event => {
 
-  e.waitUntil(
+  event.waitUntil(
+
     caches.keys().then(keys =>
+
       Promise.all(
+
         keys
-          .filter(k => k !== CACHE_NAME)
-          .map(k => caches.delete(k))
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
       )
     )
   );
@@ -36,152 +41,31 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// ===== FETCH - Offline First =====
-self.addEventListener('fetch', e => {
+// FETCH
+self.addEventListener('fetch', event => {
 
-  e.respondWith(
+  event.respondWith(
 
-    caches.match(e.request).then(cached => {
+    caches.match(event.request)
+      .then(response => {
 
-      return cached ||
+        return response ||
 
-        fetch(e.request).catch(() =>
-          caches.match('./index.html')
-        );
-    })
+          fetch(event.request).catch(() =>
+
+            caches.match(BASE + 'index.html')
+          );
+      })
   );
 });
 
-// ===== PUSH NOTIFICATIONS =====
-self.addEventListener('push', e => {
+// NOTIFICATION CLICK
+self.addEventListener('notificationclick', event => {
 
-  const data = e.data ? e.data.json() : {};
+  event.notification.close();
 
-  e.waitUntil(
+  event.waitUntil(
 
-    self.registration.showNotification(
-      data.title || 'حصنك اليومي ✨',
-      {
-        body: data.body || 'وقت الذكر والدعاء 🌿',
-
-        icon: './icons/icon-192x192.png',
-
-        badge: './icons/icon-96x96.png',
-
-        vibrate: [200, 100, 200],
-
-        dir: 'rtl',
-
-        lang: 'ar',
-
-        tag: data.tag || 'hesnk-reminder',
-
-        requireInteraction: false,
-
-        actions: [
-          {
-            action: 'open',
-            title: 'افتح التطبيق 🌿'
-          },
-          {
-            action: 'dismiss',
-            title: 'لاحقاً'
-          }
-        ]
-      }
-    )
+    clients.openWindow(BASE)
   );
 });
-
-// ===== NOTIFICATION CLICK =====
-self.addEventListener('notificationclick', e => {
-
-  e.notification.close();
-
-  if (e.action === 'dismiss') return;
-
-  e.waitUntil(
-
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then(list => {
-
-      if (list.length > 0) {
-
-        return list[0].focus();
-      }
-
-      return clients.openWindow('./');
-    })
-  );
-});
-
-// ===== PERIODIC CHECK =====
-self.addEventListener('periodicsync', e => {
-
-  if (e.tag === 'hesnk-check') {
-
-    e.waitUntil(checkAndNotify());
-  }
-});
-
-// ===== LOCAL REMINDERS =====
-async function checkAndNotify() {
-
-  const now = new Date();
-
-  const h = now.getHours();
-
-  const m = now.getMinutes();
-
-  const d = now.getDay();
-
-  if (h === 6 && m === 0) {
-
-    await self.registration.showNotification(
-      '🌅 صباح الأذكار!',
-      {
-        body: 'ابدأ يومك بذكر الله يا بطل 🌿',
-
-        icon: './icons/icon-192x192.png',
-
-        dir: 'rtl',
-
-        tag: 'morning-reminder'
-      }
-    );
-  }
-
-  if (h === 17 && m === 0) {
-
-    await self.registration.showNotification(
-      '🌙 أذكار المساء!',
-      {
-        body: 'اختم يومك بذكر الله وتنام محصن 🤍',
-
-        icon: './icons/icon-192x192.png',
-
-        dir: 'rtl',
-
-        tag: 'evening-reminder'
-      }
-    );
-  }
-
-  if (d === 5 && h === 13 && m === 0) {
-
-    await self.registration.showNotification(
-      '📖 يوم الجمعة المبارك!',
-      {
-        body: 'سورة الكهف نور بين الجمعتين ✨',
-
-        icon: './icons/icon-192x192.png',
-
-        dir: 'rtl',
-
-        tag: 'friday-reminder'
-      }
-    );
-  }
-}

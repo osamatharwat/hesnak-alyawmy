@@ -524,6 +524,7 @@ async function sbFetch(path, opts={}) {
 /* =========================
    REALTIME
 ========================= */
+
 /* ================================================================
    AZKAR DATA
 ================================================================ */
@@ -1127,7 +1128,8 @@ async function renderLeaderboard(){
   }catch(e)
   arr = await sbFetch(
   `members?group_code=eq.${myGroupCode}&select=*`
-);{
+); 
+  {
     // fallback local
     const members=JSON.parse(localStorage.getItem("group_"+myGroupCode)||"{}");
     arr=Object.values(members).sort((a,b)=>b.streak-a.streak);
@@ -1214,15 +1216,16 @@ function leaveGroup(){
   myName = null;
 
   // تحديث الواجهة
-  if(!myGroupCode){
-  document.getElementById("homeLB").style.display='none';
-}
+  document.getElementById("leaderboard").style.display="none";
   document.getElementById("groupSetup").style.display="block";
 
   renderHomeLB([]);
   showMiniToast("🚪 خرجت من الجروب");
 
 }
+  }
+}
+
 // تحميل الجروب عند فتح الصفحة لو موجود
 if(myGroupCode&&myName){
   setTimeout(async()=>{
@@ -1327,69 +1330,6 @@ if(mp&&['morning','evening','quick'].includes(mp))setTimeout(()=>startMode(mp),4
 </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-const bgMusic = document.getElementById("bgMusic");
-const musicBtn = document.getElementById("musicBtn");
-
-bgMusic.volume = 0.15;
-
-function toggleMusic(){
-
-  if(bgMusic.paused){
-
-    bgMusic.play();
-
-    musicBtn.innerText = "🔇 إيقاف الصوت";
-
-    localStorage.setItem("music","on");
-
-  }else{
-
-    bgMusic.pause();
-
-    musicBtn.innerText = "🎵 تشغيل أصوات الطبيعة";
-
-    localStorage.setItem("music","off");
-  }
-}
-
-if(localStorage.getItem("music")==="on"){
-
-  window.addEventListener("click",()=>{
-
-    bgMusic.play().catch(()=>{});
-
-    musicBtn.innerText="🔇 إيقاف الصوت";
-
-  },{once:true});
-}
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const bgMusic = document.getElementById("bgMusic");
-const musicBtn = document.getElementById("musicBtn");
-
-if(bgMusic && musicBtn){
-
-  bgMusic.volume = 0.15;
-
-  musicBtn.addEventListener("click",()=>{
-
-    if(bgMusic.paused){
-
-      bgMusic.play();
-      musicBtn.innerText = "🔇 إيقاف الصوت";
-
-    }else{
-
-      bgMusic.pause();
-      musicBtn.innerText = "🎵 تشغيل أصوات الطبيعة";
-    }
-  });
-}
-
-/* REALTIME */
-
 const { createClient } = supabase;
 
 const realtimeClient = createClient(
@@ -1402,17 +1342,51 @@ realtimeClient
 .on(
   'postgres_changes',
   {
-    event:'*',
-    schema:'public',
-    table:'members'
+    event: '*',
+    schema: 'public',
+    table: 'members'
   },
-  ()=>{
+  () => {
     if(myGroupCode){
       renderLeaderboard();
     }
   }
 )
 .subscribe();
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const { createClient } = supabase;
+
+const realtimeClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+realtimeClient
+.channel('members-live')
+.on(
+  'postgres_changes',
+  {
+    event: '*',
+    schema: 'public',
+    table: 'members'
+  },
+  payload => {
+
+    if(myGroupCode){
+      renderLeaderboard();
+    }
+
+    try{
+      new Audio(
+        'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=notification-2-269292.mp3'
+      ).play();
+    }catch(e){}
+  }
+)
+.subscribe();
+</script>
 </script>
 </body>
 </html>

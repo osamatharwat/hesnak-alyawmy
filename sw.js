@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hesnk-v5';
+const CACHE_NAME = 'hesnk-v1.2';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/icons/icon-192x192.png', '/icons/icon-512x512.png'];
 
 self.addEventListener('install', e => {

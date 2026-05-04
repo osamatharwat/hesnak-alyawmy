@@ -4,14 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>حصنك اليومي ✨</title>
-<link rel="manifest" href="/manifest.json"/>
+<link rel="manifest" href="./manifest.json"/>
 <meta name="theme-color" content="#020617"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="حصنك"/>
-<link rel="apple-touch-icon" href="/icons/icon-192x192.png"/>
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png"/>
+<link rel="apple-touch-icon" href="./icons/icon-192x192.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192x192.png"/>
 <meta name="description" content="تطبيق أذكار الصباح والمساء اليومية"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
 <!-- Supabase يتحمل أول قبل أي حاجة تانية -->
@@ -1235,7 +1235,7 @@ window.addEventListener('appinstalled',()=>{document.getElementById('installBtn'
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',async()=>{
-    try{await navigator.serviceWorker.register('/sw.js',{scope:'/'});}catch(e){console.log('SW:',e);}
+    try{await navigator.serviceWorker.register('./sw.js')',{scope:'/'});}catch(e){console.log('SW:',e);}
   });
 }
 const up=new URLSearchParams(window.location.search),mp=up.get('mode');

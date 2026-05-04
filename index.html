@@ -1235,7 +1235,7 @@ window.addEventListener('appinstalled',()=>{document.getElementById('installBtn'
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',async()=>{
-    try{await navigator.serviceWorker.register('./sw.js')',{scope:'/'});}catch(e){console.log('SW:',e);}
+    try{await navigator.serviceWorker.register('./sw.js',{scope:'/'});}catch(e){console.log('SW:',e);}
   });
 }
 const up=new URLSearchParams(window.location.search),mp=up.get('mode');

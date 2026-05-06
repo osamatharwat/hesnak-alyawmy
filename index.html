@@ -40,7 +40,7 @@
             </div>
         </header>
         <main class="pt-24 px-4 space-y-6 max-w-2xl mx-auto">
-           <!-- Prayer Countdown -->
+           <!-- Prayer Countdown (عداد الصلاة ) -->
             <section class="glass-card prayer-glow rounded-3xl p-6 relative overflow-hidden">
                 <div class="absolute -top-12 -left-12 w-32 h-32 bg-secondary-container/10 rounded-full blur-3xl"></div>
                 <div class="flex flex-col items-center justify-center space-y-2 relative z-10">
@@ -52,7 +52,20 @@
                     <span class="bg-surface-container-high px-3 py-1 rounded-full text-sm mt-2">المتبقي للصلاة</span>
                 </div>
             </section>
-            <!-- Sadaqa Grid -->
+
+            <!-- Daily Quote Widget (شريط الاقتباس بين الصلاة والصدقة) -->
+            <section class="glass-card rounded-2xl p-4 flex items-center justify-between cursor-pointer active:scale-95 transition-transform" onclick="changeQuote()">
+                <div class="flex items-center gap-4 w-full">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center text-primary shadow-[0_0_10px_rgba(242,202,80,0.15)]">
+                        <span class="material-symbols-outlined">auto_stories</span>
+                    </div>
+                    <p id="dailyQuote" class="font-headline-md text-on-surface text-[15px] flex-grow text-right leading-relaxed transition-opacity duration-300">ألا بذكر الله تطمئن القلوب</p>
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+                        <span class="material-symbols-outlined text-primary text-sm">refresh</span>
+                    </div>
+                </div>
+            </section>
+
             <section class="space-y-4">
                 <h2 class="font-headline-md text-on-surface px-2">صدقة جارية</h2>
                 <div id="sadaqaScroll" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>

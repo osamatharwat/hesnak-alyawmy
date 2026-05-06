@@ -40,15 +40,16 @@
             </div>
         </header>
         <main class="pt-24 px-4 space-y-6 max-w-2xl mx-auto">
-            <!-- Prayer Countdown -->
+           <!-- Prayer Countdown -->
             <section class="glass-card prayer-glow rounded-3xl p-6 relative overflow-hidden">
                 <div class="absolute -top-12 -left-12 w-32 h-32 bg-secondary-container/10 rounded-full blur-3xl"></div>
                 <div class="flex flex-col items-center justify-center space-y-2 relative z-10">
                     <span class="font-headline-md text-on-surface-variant flex items-center gap-2">
-                        <span class="material-symbols-outlined text-secondary-fixed">dark_mode</span> العشاء
+                        <span id="nextPrayerIcon" class="material-symbols-outlined text-secondary-fixed">schedule</span> 
+                        <span id="nextPrayerName">جاري الحساب...</span>
                     </span>
-                    <div class="text-5xl font-bold text-primary font-headline-xl">01:42:15</div>
-                    <span class="bg-surface-container-high px-3 py-1 rounded-full text-sm">المتبقي للصلاة</span>
+                    <div id="nextPrayerTime" class="text-5xl font-bold text-primary font-headline-xl" style="direction: ltr;">00:00:00</div>
+                    <span class="bg-surface-container-high px-3 py-1 rounded-full text-sm mt-2">المتبقي للصلاة</span>
                 </div>
             </section>
             <!-- Sadaqa Grid -->

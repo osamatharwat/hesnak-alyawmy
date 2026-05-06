@@ -560,3 +560,11 @@ document.getElementById('installBtn').addEventListener('click', async () => {
 });
 
 window.addEventListener('appinstalled', () => document.getElementById('installBtn').style.display = 'none');
+// تشغيل وتفعيل الـ Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((reg) => console.log('Service Worker Registered!', reg))
+      .catch((err) => console.log('Service Worker Failed!', err));
+  });
+}

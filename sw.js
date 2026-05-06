@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hesnak-cache-v2';
+const CACHE_NAME = 'hesnak-cache-v1.8';
 const urlsToCache = [
   './', './index.html', './style.css', './data.js', './app.js', './manifest.json', './icon-192.png', './icon-512.png'
 ];

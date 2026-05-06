@@ -53,7 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initStreak();
     renderDynamicLists();
     bindEvents();
-    fetchPrayerTimes(); // <--- السطر ده اللي ضفناه
+    fetchPrayerTimes(); 
+    changeQuote();
     if (AppState.myGroupCode) showLeaderboard();
 });
 
@@ -393,4 +394,21 @@ function startCountdown(timings, prayers) {
         document.getElementById('nextPrayerTime').innerText = 
             `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }, 1000);
+}
+/* ================================================================
+   8. DAILY QUOTES (الاقتباسات العشوائية)
+================================================================ */
+function changeQuote() {
+    // التأكد إن مصفوفة الاقتباسات موجودة
+    if (typeof quotes !== 'undefined' && quotes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        const quoteElement = document.getElementById('dailyQuote');
+        
+        // حركة خفيفة وقت التغيير
+        quoteElement.style.opacity = 0;
+        setTimeout(() => {
+            quoteElement.innerText = quotes[randomIndex];
+            quoteElement.style.opacity = 1;
+        }, 200);
+    }
 }

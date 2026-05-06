@@ -412,3 +412,19 @@ function changeQuote() {
         }, 200);
     }
 }
+function shareQuote() {
+    const quoteText = document.getElementById('dailyQuote').innerText;
+    const shareMessage = `✨ "${quoteText}"\n\n🌿 حصنك اليومي:\n${APP_URL}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'حصنك اليومي',
+            text: shareMessage
+        }).catch((err) => console.log('Share canceled'));
+    } else if (navigator.clipboard) {
+       
+        navigator.clipboard.writeText(shareMessage).then(() => {
+            showMiniToast("تم نسخ الاقتباس! ✅");
+        });
+    }
+}

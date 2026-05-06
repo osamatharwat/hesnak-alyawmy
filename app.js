@@ -257,23 +257,72 @@ async function fetchLeaderboard() {
 }
 
 /* ================================================================
-   6. PWA INSTALL
+   6. PWA INSTALL & PLATFORM DETECTION (التحميل وفصل الأجهزة)
 ================================================================ */
 const installBtn = document.getElementById('installBtn');
 let deferredPrompt = null;
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-if (!isStandalone) installBtn.style.display = 'flex';
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex'; });
-installBtn.addEventListener('click', async () => { 
-    if (!deferredPrompt) return showMiniToast("📱 الآيفون: اضغط زر المشاركة ثم 'Add to Home Screen'");
-    deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; 
-    if (outcome === 'accepted') installBtn.style.display = 'none'; deferredPrompt = null; 
-});
-window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; showMiniToast("✅ تم تنزيل التطبيق!"); });
 
-// PWA Service Worker Registration
+// 1. هل التطبيق متحمل أصلاً؟
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+// 2. هل المستخدم فاتح من آيفون/آيباد؟
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+if (isStandalone) {
+    // لو التطبيق نازل بالفعل، اخفي الزرار تماماً
+    installBtn.style.display = 'none';
+} else {
+    if (isIOS) {
+        // لو آيفون، اظهر الزرار دايماً عشان هنقوله التعليمات لما يدوس
+        installBtn.style.display = 'flex';
+    } else {
+        // لو ديسكتوب أو أندرويد، اخفي الزرار مؤقتاً لحد ما المتصفح يدينا الإذن بالتحميل
+        installBtn.style.display = 'none';
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // المتصفح بيقولنا: أنا جاهز للتحميل!
+            e.preventDefault();
+            deferredPrompt = e;
+            // اظهر الزرار دلوقتي بس
+            installBtn.style.display = 'flex';
+        });
+    }
+}
+
+// لما المستخدم يدوس على زرار التنزيل
+installBtn.addEventListener('click', async () => {
+    if (isIOS) {
+        showMiniToast("📱 في الآيفون: اضغط زر المشاركة (Share) بالأسفل واختار 'Add to Home Screen'");
+        return;
+    }
+
+    if (deferredPrompt) {
+        // إظهار نافذة التحميل الرسمية بتاعت جوجل كروم/إيدج
+        deferredPrompt.prompt();
+        // استنى رد المستخدم (وافق ولا رفض)
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none'; // اخفي الزرار بعد التحميل
+        }
+        deferredPrompt = null;
+    } else {
+        // لو داس والنافذة مش جاهزة لسبب ما
+        showMiniToast("💡 التنزيل غير متاح حالياً أو التطبيق تم تنزيله بالفعل");
+    }
+});
+
+// لما التحميل ينجح فعلياً
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    deferredPrompt = null;
+    showMiniToast("✅ تم تنزيل التطبيق بنجاح!");
+});
+
+// تسجيل الـ Service Worker (أساس الـ PWA)
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+  window.addEventListener('load', () => { 
+      navigator.serviceWorker.register('./sw.js'); 
+  });
 }
 /* ================================================================
    7. PRAYER TIMES & COUNTDOWN (مواقيت الصلاة)

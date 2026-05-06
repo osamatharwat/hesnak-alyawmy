@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>حصنك اليومي</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./icon-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f2ca50", "on-background": "#dae2fd", "background": "#0b1326",
+              "surface": "#0b1326", "surface-container": "#171f33", "surface-container-low": "#131b2e",
+              "surface-container-high": "#222a3d", "on-surface": "#dae2fd", "on-surface-variant": "#d0c5af",
+              "secondary": "#bdf4ff", "secondary-container": "#00e3fd", "secondary-fixed": "#9cf0ff",
+              "primary-container": "#d4af37", "on-primary": "#3c2f00", "tertiary": "#c6cdeb"
+            },
+            fontFamily: { "headline-xl": ["Cairo"], "headline-md": ["Cairo"], "body-md": ["Manrope"], "label-sm": ["Manrope"] }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="min-h-screen font-body-md relative">
+    
+    <!-- Toast Notification -->
+    <div id="miniToast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-6 py-2 rounded-full font-bold opacity-0 transition-opacity z-[9999] pointer-events-none shadow-lg"></div>
+
+    <!-- ================= 1. HOME SCREEN ================= -->
+    <div id="homeScreen" class="block w-full h-full pb-24">
+        <header class="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-4 h-16 bg-surface/80 backdrop-blur-xl border-b border-white/10">
+            <h1 class="font-headline-md text-2xl font-bold text-primary tracking-tight">حصنك اليومي</h1>
+            <div class="flex items-center gap-2">
+                <span id="streakBadge" class="bg-primary/20 text-primary px-3 py-1 rounded-full font-bold text-sm">🔥 0</span>
+            </div>
+        </header>
+        <main class="pt-24 px-4 space-y-6 max-w-2xl mx-auto">
+            <!-- Prayer Countdown -->
+            <section class="glass-card prayer-glow rounded-3xl p-6 relative overflow-hidden">
+                <div class="absolute -top-12 -left-12 w-32 h-32 bg-secondary-container/10 rounded-full blur-3xl"></div>
+                <div class="flex flex-col items-center justify-center space-y-2 relative z-10">
+                    <span class="font-headline-md text-on-surface-variant flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary-fixed">dark_mode</span> العشاء
+                    </span>
+                    <div class="text-5xl font-bold text-primary font-headline-xl">01:42:15</div>
+                    <span class="bg-surface-container-high px-3 py-1 rounded-full text-sm">المتبقي للصلاة</span>
+                </div>
+            </section>
+            <!-- Sadaqa Grid -->
+            <section class="space-y-4">
+                <h2 class="font-headline-md text-on-surface px-2">صدقة جارية</h2>
+                <div id="sadaqaScroll" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+            </section>
+            <!-- Mini Leaderboard -->
+            <section class="glass-card rounded-3xl p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">leaderboard</span>
+                    <h2 class="font-headline-md text-on-surface">المتصدرين</h2>
+                </div>
+                <div id="homeLBRows" class="space-y-3"></div>
+            </section>
+            <!-- Action Buttons -->
+            <section class="grid grid-cols-2 gap-4 pb-10">
+                <button id="btnShareHome" class="bg-primary gold-glow text-on-primary font-headline-md py-3 rounded-2xl flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">share</span> شارك
+                </button>
+                <button id="installBtn" style="display:none;" class="border border-white/20 bg-white/5 text-on-surface font-headline-md py-3 rounded-2xl flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">download</span> تنزيل
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <!-- ================= 2. DHIKR BOTTOM SHEET ================= -->
+    <div id="dhikrSheetBg" class="fixed inset-0 bg-background/60 backdrop-blur-sm fade-in"></div>
+    <div id="dhikrSheet" class="fixed bottom-0 left-0 w-full bg-surface-container-low/95 backdrop-blur-2xl rounded-t-[32px] border-t border-white/10 p-6 pb-24 modal-slide-up">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-headline-md text-on-surface text-xl">اختر الورد</h3>
+            <button id="btnCloseDhikr" class="material-symbols-outlined text-on-surface-variant p-2 bg-white/5 rounded-full">close</button>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="glass-card rounded-2xl p-5 flex flex-col items-center space-y-3 glow-border cursor-pointer" onclick="startMode('morning')">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-2xl">wb_sunny</span></div>
+                <span class="font-headline-md text-on-surface">أذكار الصباح</span>
+            </div>
+            <div class="glass-card rounded-2xl p-5 flex flex-col items-center space-y-3 glow-border cursor-pointer" onclick="startMode('evening')">
+                <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary"><span class="material-symbols-outlined text-2xl">nights_stay</span></div>
+                <span class="font-headline-md text-on-surface">أذكار المساء</span>
+            </div>
+            <div class="glass-card rounded-2xl p-5 flex flex-col items-center space-y-3 glow-border cursor-pointer" onclick="startMode('quick')">
+                <div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary"><span class="material-symbols-outlined text-2xl">auto_stories</span></div>
+                <span class="font-headline-md text-on-surface">الجامع المختصر</span>
+            </div>
+            <div class="glass-card rounded-2xl p-5 flex flex-col items-center space-y-3 glow-border cursor-pointer" onclick="openKahf()">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-2xl">menu_book</span></div>
+                <span class="font-headline-md text-on-surface">سورة الكهف</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 3. DUAS MODAL ================= -->
+    <main id="duasModal" class="fixed inset-0 w-full h-screen bg-surface modal-slide-up flex flex-col overflow-hidden">
+        <header class="w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 h-16 pt-2">
+            <h1 class="font-headline-md text-primary font-bold text-xl">الأدعية الجامعة</h1>
+            <button class="close-modal-btn w-10 h-10 flex items-center justify-center rounded-full bg-white/5"><span class="material-symbols-outlined text-on-surface">close</span></button>
+        </header>
+        <section class="flex-grow p-4 overflow-y-auto pb-24">
+            <div id="duaGrid" class="grid grid-cols-2 gap-4"></div>
+        </section>
+    </main>
+
+    <!-- ================= 4. TASBEEH MODAL ================= -->
+    <main id="tasbeehModal" class="fixed inset-0 w-full h-screen bg-surface modal-slide-up flex flex-col overflow-hidden">
+        <header class="w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 h-16 pt-2">
+            <h1 class="font-headline-md text-primary font-bold text-xl">المسبحة الإلكترونية</h1>
+            <button class="close-modal-btn w-10 h-10 flex items-center justify-center rounded-full bg-white/5"><span class="material-symbols-outlined text-on-surface">close</span></button>
+        </header>
+        <section class="flex-grow flex flex-col items-center justify-center p-4">
+            <div class="glass-card rounded-3xl p-8 w-full max-w-sm text-center space-y-6">
+                <span id="freeCounterLabel" class="font-headline-xl text-7xl text-primary font-bold block">0</span>
+                <p class="text-on-surface-variant">النقاط تضاف لترتيبك في الجروب!</p>
+                <div class="flex gap-4 justify-center">
+                    <button id="btnIncreaseTasbeeh" class="w-24 h-24 rounded-full bg-primary/20 text-primary border border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(242,202,80,0.2)] active:scale-90 transition-transform">
+                        <span class="material-symbols-outlined text-4xl">fingerprint</span>
+                    </button>
+                    <button id="btnResetTasbeeh" class="w-12 h-12 rounded-full bg-white/5 text-on-surface-variant flex items-center justify-center mt-6 active:scale-90"><span class="material-symbols-outlined">refresh</span></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= 5. COMMUNITY MODAL ================= -->
+    <main id="communityModal" class="fixed inset-0 w-full h-screen bg-surface modal-slide-up flex flex-col overflow-hidden">
+        <header class="w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 h-16 pt-2">
+            <h1 class="font-headline-md text-primary font-bold text-xl">تحدي الجروب</h1>
+            <button class="close-modal-btn w-10 h-10 flex items-center justify-center rounded-full bg-white/5"><span class="material-symbols-outlined text-on-surface">close</span></button>
+        </header>
+        <section class="flex-grow p-4 overflow-y-auto pb-24" id="groupArea">
+            <!-- Setup -->
+            <div id="groupSetup" class="glass-card rounded-3xl p-6 space-y-4">
+                <h2 class="text-xl font-bold text-primary">انضم للتحدي</h2>
+                <input type="text" id="nameInput" placeholder="اسمك الأول" class="w-full bg-background border border-white/10 rounded-xl p-3 text-on-surface">
+                <button id="btnCreateGroup" class="w-full bg-primary text-on-primary py-3 rounded-xl font-bold">إنشاء جروب جديد</button>
+                <button id="btnShowJoin" class="w-full bg-white/5 text-on-surface py-3 rounded-xl">لدي كود دعوة</button>
+                <div id="joinRow" class="hidden space-y-3 mt-4">
+                    <input type="text" id="codeInput" placeholder="كود الجروب (6 أرقام)" class="w-full bg-background border border-white/10 rounded-xl p-3 text-on-surface text-center tracking-widest">
+                    <button id="btnJoinGroup" class="w-full bg-secondary-container text-on-secondary-container py-3 rounded-xl font-bold">انضمام للجروب</button>
+                </div>
+                <p id="groupStatus" class="text-sm text-center mt-2"></p>
+            </div>
+            <!-- Leaderboard -->
+            <div id="leaderboardView" class="hidden space-y-4">
+                <div class="glass-card rounded-2xl p-4 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-on-surface-variant">كود الجروب:</p>
+                        <p id="groupCodeDisplay" class="text-2xl font-bold text-primary tracking-widest cursor-pointer"></p>
+                    </div>
+                    <button id="btnShareGroup" class="bg-white/5 p-3 rounded-xl"><span class="material-symbols-outlined text-primary">share</span></button>
+                </div>
+                <div class="glass-card rounded-3xl p-4 space-y-2" id="lbRows"></div>
+                <button id="btnLeaveGroup" class="w-full bg-error/20 text-error py-3 rounded-xl border border-error/30">مغادرة الجروب</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= 6. ZEKR COUNTER MODAL (ACTIVE DHIKR) ================= -->
+    <main id="zekrModal" class="fixed inset-0 w-full h-screen bg-surface modal-slide-up flex flex-col overflow-hidden z-[110]">
+        <header class="w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 flex flex-col pt-2">
+            <div class="flex items-center justify-between px-4 h-14">
+                <button id="btnCloseZekr" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5"><span class="material-symbols-outlined text-on-surface">close</span></button>
+                <h1 id="zekrTitle" class="font-headline-md text-primary font-bold">أذكار</h1>
+                <div class="w-10"></div>
+            </div>
+            <div class="w-full h-1 bg-white/5"><div id="progress" class="h-full w-0 progress-gradient rounded-r-full transition-all duration-300"></div></div>
+        </header>
+        <section class="flex-grow flex flex-col items-center justify-center px-4 pb-32 text-center overflow-y-auto">
+            <div class="w-full space-y-6">
+                <p id="zekrText" class="font-headline-xl text-3xl leading-[1.8] text-on-surface drop-shadow-md px-2"></p>
+                <div id="zekrFadl" class="inline-flex items-center px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-on-surface-variant hidden"></div>
+            </div>
+        </section>
+        <footer class="absolute bottom-0 left-0 w-full px-6 pb-8 pt-8 bg-gradient-to-t from-background via-background/90 to-transparent flex flex-col items-center space-y-4">
+            <span id="counter" class="font-headline-xl text-4xl font-extrabold text-primary">0/1</span>
+            <button id="btnCountZekr" class="w-full max-w-[250px] h-20 rounded-[2rem] bg-gradient-to-r from-primary-container to-primary flex items-center justify-center shadow-[0_10px_30px_rgba(242,202,80,0.3)] active:scale-95 transition-all">
+                <span class="font-headline-md font-bold text-on-primary ml-3 text-xl">سبّح</span>
+                <span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">fingerprint</span>
+            </button>
+        </footer>
+    </main>
+
+    <!-- ================= 7. KAHF MODAL ================= -->
+    <main id="kahfModal" class="fixed inset-0 w-full h-screen bg-surface modal-slide-up flex flex-col overflow-hidden">
+        <header class="w-full bg-surface/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 h-16 pt-2">
+            <h1 class="font-headline-md text-primary font-bold text-xl">سورة الكهف</h1>
+            <button class="close-modal-btn w-10 h-10 flex items-center justify-center rounded-full bg-white/5"><span class="material-symbols-outlined text-on-surface">close</span></button>
+        </header>
+        <section class="flex-grow flex flex-col items-center justify-center p-6 text-center">
+            <p id="kahfText" class="font-headline-xl text-2xl leading-[2] text-on-surface drop-shadow-md"></p>
+            <div class="flex gap-4 mt-10">
+                <button id="btnKahfNext" class="bg-primary text-on-primary px-6 py-3 rounded-xl font-bold">التالي</button>
+                <button id="btnKahfPrev" class="bg-white/5 text-on-surface px-6 py-3 rounded-xl border border-white/10">السابق</button>
+            </div>
+            <p id="kahfBadge" class="mt-4 text-on-surface-variant text-sm"></p>
+        </section>
+    </main>
+
+    <!-- ================= BOTTOM NAVIGATION ================= -->
+    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface-container/90 backdrop-blur-2xl border-t border-white/10 rounded-t-2xl pb-safe">
+        <button onclick="closeAllModals()" class="flex flex-col items-center text-primary active:scale-90 transition-transform w-16">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="text-[10px] font-bold mt-1">الرئيسية</span>
+        </button>
+        <button id="btnOpenDhikr" class="flex flex-col items-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform w-16">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            <span class="text-[10px] font-bold mt-1">الأذكار</span>
+        </button>
+        <button onclick="openModal('tasbeehModal')" class="flex flex-col items-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform w-16">
+            <span class="material-symbols-outlined">fingerprint</span>
+            <span class="text-[10px] font-bold mt-1">تسبيح</span>
+        </button>
+        <button onclick="openModal('duasModal')" class="flex flex-col items-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform w-16">
+            <span class="material-symbols-outlined">menu_book</span>
+            <span class="text-[10px] font-bold mt-1">أدعية</span>
+        </button>
+        <button onclick="openModal('communityModal')" class="flex flex-col items-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform w-16">
+            <span class="material-symbols-outlined">group</span>
+            <span class="text-[10px] font-bold mt-1">المجتمع</span>
+        </button>
+    </nav>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

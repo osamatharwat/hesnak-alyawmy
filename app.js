@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initStreak();
     renderDynamicLists();
     bindEvents();
+    fetchPrayerTimes(); // <--- السطر ده اللي ضفناه
     if (AppState.myGroupCode) showLeaderboard();
 });
 
@@ -273,4 +274,74 @@ window.addEventListener('appinstalled', () => { installBtn.style.display = 'none
 // PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+}
+/* ================================================================
+   7. PRAYER TIMES & COUNTDOWN (مواقيت الصلاة)
+================================================================ */
+let countdownInterval;
+
+async function fetchPrayerTimes() {
+    try {
+        // بنجيب المواقيت للقاهرة/مصر (طريقة 5: الهيئة العامة للمساحة المصرية)
+        const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5');
+        const data = await res.json();
+        const timings = data.data.timings;
+        
+        const prayers = [
+            { id: 'Fajr', name: 'الفجر', icon: 'wb_twilight' },
+            { id: 'Dhuhr', name: 'الظهر', icon: 'light_mode' },
+            { id: 'Asr', name: 'العصر', icon: 'wb_sunny' },
+            { id: 'Maghrib', name: 'المغرب', icon: 'wb_twilight' },
+            { id: 'Isha', name: 'العشاء', icon: 'dark_mode' }
+        ];
+
+        startCountdown(timings, prayers);
+    } catch (error) {
+        document.getElementById('nextPrayerName').innerText = "غير متصل بالإنترنت";
+    }
+}
+
+function startCountdown(timings, prayers) {
+    if(countdownInterval) clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+        const now = new Date();
+        let nextPrayer = null;
+        let nextPrayerDate = null;
+
+        for (let i = 0; i < prayers.length; i++) {
+            const timeStr = timings[prayers[i].id]; 
+            const [hours, minutes] = timeStr.split(':');
+            const prayerDate = new Date();
+            prayerDate.setHours(hours, minutes, 0, 0);
+
+            if (prayerDate > now) {
+                nextPrayer = prayers[i];
+                nextPrayerDate = prayerDate;
+                break;
+            }
+        }
+
+        // لو الصلاة الجاية هي الفجر بتاع بكرة (يعني إحنا بعد العشاء)
+        if (!nextPrayer) {
+            nextPrayer = prayers[0]; 
+            const timeStr = timings[nextPrayer.id];
+            const [hours, minutes] = timeStr.split(':');
+            nextPrayerDate = new Date();
+            nextPrayerDate.setDate(nextPrayerDate.getDate() + 1); // نزود يوم
+            nextPrayerDate.setHours(hours, minutes, 0, 0);
+        }
+
+        // حساب الفرق (ساعات، دقايق، ثواني)
+        const diff = nextPrayerDate - now;
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        // تحديث الشاشة
+        document.getElementById('nextPrayerName').innerText = nextPrayer.name;
+        document.getElementById('nextPrayerIcon').innerText = nextPrayer.icon;
+        document.getElementById('nextPrayerTime').innerText = 
+            `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }, 1000);
 }
